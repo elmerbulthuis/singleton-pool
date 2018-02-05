@@ -1,6 +1,7 @@
 import * as assert from "assert";
 import { destroyIn, getIn, setIn } from "deepkit";
 import { Disposable, DisposableComposition, isDisposable } from "using-disposable";
+import { toPropertyKey } from "./property-key";
 
 export type InstanceFactory<
     TInstance extends object,
@@ -20,12 +21,20 @@ export class SingletonPool<
     TInstance extends object,
     TArg extends object> extends DisposableComposition {
     private cache: any;
+    private keyFactory: KeyFactory<TArg>;
 
     constructor(
         private instanceFactory: InstanceFactory<TInstance, TArg>,
-        private keyFactory: KeyFactory<TArg>,
+        keyFactory?: KeyFactory<TArg>,
     ) {
         super();
+
+        if (keyFactory === undefined) {
+            this.keyFactory = (arg: TArg) => Object.keys(arg).
+                sort().
+                map(key => toPropertyKey(arg[key as keyof TArg]));
+        }
+        else this.keyFactory = keyFactory;
     }
 
     public async lease(arg: TArg): Promise<TInstance> {
