@@ -30,9 +30,11 @@ export class SingletonPool<
         super();
 
         if (keyFactory === undefined) {
-            this.keyFactory = (arg: TArg) => Object.keys(arg).
-                sort().
-                map(key => toPropertyKey(arg[key as keyof TArg]));
+            this.keyFactory = (arg: TArg) => Array.isArray(arg) ?
+                arg.map(key => toPropertyKey(key)) :
+                Object.keys(arg).
+                    sort().
+                    map(key => toPropertyKey(arg[key as keyof TArg]));
         }
         else this.keyFactory = keyFactory;
     }
