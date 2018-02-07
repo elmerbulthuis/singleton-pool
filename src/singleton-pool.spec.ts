@@ -51,3 +51,35 @@ test("singleton-pool", async t => {
     pool.dispose();
     t.equal(d3.isDisposed, true);
 });
+
+test("singleton-pool-array", async t => {
+    const pool = new SingletonPool(
+        ([value]: [string]) => Dummy.create(value),
+    );
+
+    const d = await pool.lease(["a"]);
+    const d1 = await pool.lease(["a"]);
+    t.equal(d1.key, d.key);
+
+    await d.dispose();
+    t.equal(d.isDisposed, false);
+
+    await d.dispose();
+    t.equal(d.isDisposed, false);
+
+    const d2 = await pool.lease(["a"]);
+    t.equal(d2.key, d.key);
+    t.equal(d.isDisposed, false);
+
+    await d1.dispose();
+    await d2.dispose();
+    t.equal(d.isDisposed, true);
+    t.equal(d1.key, d.key);
+    t.equal(d2.key, d.key);
+
+    const d3 = await pool.lease(["a"]);
+    t.notEqual(d3.key, d.key);
+
+    pool.dispose();
+    t.equal(d3.isDisposed, true);
+});
