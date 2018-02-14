@@ -83,3 +83,18 @@ test("singleton-pool-array", async t => {
     pool.dispose();
     t.equal(d3.isDisposed, true);
 });
+
+test("singleton-pool-factory-instance-error", async t => {
+    const pool = new SingletonPool(
+        ([value]: [string]) => {
+            throw new Error("hi");
+        },
+    );
+    try {
+        const d = await pool.lease(["a"]);
+        t.fail();
+    }
+    catch (err) {
+        t.pass();
+    }
+});
