@@ -1,6 +1,5 @@
-import * as assert from "assert";
 import { destroyIn, getIn, setIn } from "deepkit";
-import { Disposable, DisposableComposition, isDisposable } from "using-disposable";
+import { DisposableComposition, isDisposable } from "using-disposable";
 import { toPropertyKey } from "./property-key";
 
 export type InstanceFactory<
@@ -20,6 +19,7 @@ interface SingletonPoolCacheItem<TInstance extends object> {
 export class SingletonPool<
     TInstance extends object,
     TArg extends object> extends DisposableComposition {
+    // this here is being used!!!
     private cache: any;
     private keyFactory: KeyFactory<TArg>;
 
