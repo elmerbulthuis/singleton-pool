@@ -1,5 +1,5 @@
 import * as test from "blue-tape";
-import { Disposable } from "using-disposable";
+import { Disposable } from "dispose";
 import { SingletonPool } from "./singleton-pool";
 
 class Dummy implements Disposable {

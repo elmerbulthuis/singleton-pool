@@ -1,6 +1,5 @@
-import * as assert from "assert";
 import { destroyIn, getIn, setIn } from "deepkit";
-import { Disposable, DisposableComposition, isDisposable } from "using-disposable";
+import { DisposableComposition, isDisposable } from "dispose";
 import { toPropertyKey } from "./property-key";
 
 export type InstanceFactory<
