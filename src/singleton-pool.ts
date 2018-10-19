@@ -18,7 +18,7 @@ interface SingletonPoolCacheItem<TInstance extends object> {
 
 export class SingletonPool<
     TInstance extends object,
-    TArg extends PropertyKey[]> extends DisposableComposition {
+    TArg extends any[]> extends DisposableComposition {
 
     private readonly keyFactory: KeyFactory<TArg>;
 
