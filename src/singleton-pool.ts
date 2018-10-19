@@ -1,15 +1,10 @@
 import { destroyIn, getIn, setIn } from "deepkit";
 import { DisposableComposition, isDisposable } from "dispose";
-import { toPropertyKey } from "./property-key";
 
 export type InstanceFactory<
     TInstance extends object,
-    TArg extends object> =
-    (arg: TArg) => TInstance | PromiseLike<TInstance>;
-
-export type KeyFactory<
-    TArg extends object> =
-    (args: TArg) => PropertyKey[];
+    TArg extends PropertyKey[]> =
+    (...arg: TArg) => TInstance | PromiseLike<TInstance>;
 
 interface SingletonPoolCacheItem<TInstance extends object> {
     instance: TInstance;
@@ -18,33 +13,21 @@ interface SingletonPoolCacheItem<TInstance extends object> {
 
 export class SingletonPool<
     TInstance extends object,
-    TArg extends object> extends DisposableComposition {
-    private cache: any;
-    private keyFactory: KeyFactory<TArg>;
+    TArg extends PropertyKey[]> extends DisposableComposition {
 
     constructor(
         private instanceFactory: InstanceFactory<TInstance, TArg>,
-        keyFactory?: KeyFactory<TArg>,
     ) {
         super();
-
-        if (keyFactory === undefined) {
-            this.keyFactory = (arg: TArg) => Array.isArray(arg) ?
-                arg.map(key => toPropertyKey(key)) :
-                Object.keys(arg).
-                    sort().
-                    map(key => toPropertyKey(arg[key as keyof TArg]));
-        }
-        else this.keyFactory = keyFactory;
     }
 
-    public async lease(arg: TArg): Promise<TInstance> {
-        const cacheKey = this.keyFactory(arg);
+    public async lease(...arg: TArg): Promise<TInstance> {
+        const cacheKey = arg;
         const cachePath = ["cache", ...cacheKey];
         let cacheItem: SingletonPoolCacheItem<TInstance> | null = getIn(this, cachePath, null);
         let instance: TInstance;
         if (cacheItem === null) {
-            instance = await this.instanceFactory(arg);
+            instance = await this.instanceFactory(...arg);
             if (isDisposable(instance)) this.registerDisposable(instance);
             cacheItem = {
                 instance,
