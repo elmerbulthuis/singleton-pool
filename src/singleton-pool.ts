@@ -1,10 +1,15 @@
 import { destroyIn, getIn, setIn } from "deepkit";
 import { DisposableComposition, isDisposable } from "dispose";
+import { toPropertyKey } from "./property-key";
 
 export type InstanceFactory<
     TInstance extends object,
-    TArg extends PropertyKey[]> =
+    TArg extends any[]> =
     (...arg: TArg) => TInstance | PromiseLike<TInstance>;
+
+export type KeyFactory<
+    TArg extends any[]> =
+    (...args: TArg) => PropertyKey[];
 
 interface SingletonPoolCacheItem<TInstance extends object> {
     instance: TInstance;
@@ -15,10 +20,20 @@ export class SingletonPool<
     TInstance extends object,
     TArg extends PropertyKey[]> extends DisposableComposition {
 
+    private readonly keyFactory: KeyFactory<TArg>;
+
     constructor(
-        private instanceFactory: InstanceFactory<TInstance, TArg>,
+        private readonly instanceFactory: InstanceFactory<TInstance, TArg>,
+        keyFactory?: KeyFactory<TArg>,
     ) {
         super();
+
+        if (keyFactory === undefined) {
+            this.keyFactory = (...arg: TArg) => arg.map(toPropertyKey);
+        }
+        else {
+            this.keyFactory = keyFactory;
+        }
     }
 
     public async lease(...arg: TArg): Promise<TInstance> {

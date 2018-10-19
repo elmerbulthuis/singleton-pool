@@ -6,6 +6,6 @@ export function toPropertyKey(value: any): PropertyKey {
         case "symbol":
             return value;
 
-        default: throw new Error(`${type} is not a string or a number`);
+        default: throw new Error(`${type} is not a string or a number or a symbol`);
     }
 }
