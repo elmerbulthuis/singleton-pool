@@ -1,6 +1,6 @@
 {
   "name": "singleton-pool",
-  "version": "0.1.3",
+  "version": "1.0.0",
   "description": "",
   "main": "./node/main.js",
   "module": "./module/main.js",
